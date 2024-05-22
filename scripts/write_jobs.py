@@ -83,6 +83,7 @@ def generate_runs(run_dicts: List[dict],
 
             print(num_runs, run_string)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('hyperparam_file', type=str)
@@ -97,7 +98,6 @@ if __name__ == "__main__":
     results_dir = Path(ROOT_DIR, 'results')
     # if not args.local:
     #     # Here we assume we want to write to the scratch directory in CC.
-    #     results_dir = Path("/home/taodav/scratch/uncertainty/results")
 
     # Make our directories if it doesn't exist
     runs_dir.mkdir(parents=True, exist_ok=True)

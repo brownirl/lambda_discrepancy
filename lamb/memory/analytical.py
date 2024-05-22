@@ -1,4 +1,4 @@
-from grl.mdp import MDP, POMDP
+from lamb.mdp import MDP, POMDP
 
 import numpy as np
 from jax import jit, nn

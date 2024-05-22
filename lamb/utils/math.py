@@ -1,6 +1,6 @@
 from functools import partial
 import math
-from typing import Tuple, Sequence
+from typing import Tuple, Sequence, Union
 
 import jax
 import jax.numpy as jnp
@@ -32,8 +32,6 @@ def glorot_init(shape: Sequence[int], scale: float = 0.5) -> jnp.ndarray:
 def all_t_discounted_returns(discounts: np.ndarray, rewards: np.ndarray):
     """
     Calculating discounted returns for every time step.
-    Taken from
-    https://github.com/samlobel/grl/blob/4f7837ec7ea48d9f167420ac59c8d65b1d332161/grl/baselines/rnn_agent.py#L39
     """
     # Since we're calculating returns for each reward, we need to step timestep back by one
     shunted_discounts = np.concatenate([np.ones_like(discounts[0:1]), discounts[:-1]])

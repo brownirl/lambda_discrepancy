@@ -34,7 +34,7 @@ def get_gymnax_env(env_name: str,
                    action_concat: bool = False):
 
     mask_dims = None
-    envs_dir = Path(ROOT_DIR) / 'porl' / 'envs'
+    envs_dir = Path(ROOT_DIR) / 'lamb' / 'envs'
 
     pomdp_dir = envs_dir / 'classic' / 'POMDP'
     pomdp_files = [pd.stem for pd in pomdp_dir.iterdir()]
@@ -73,7 +73,7 @@ def get_gymnax_env(env_name: str,
     elif 'rocksample' in env_name:  # [rocksample, rocksample_15_15]
 
         if len(env_name.split('_')) > 1:
-            config_path = Path(ROOT_DIR, 'porl', 'envs', 'configs', f'{env_name}_config.json')
+            config_path = Path(ROOT_DIR, 'lamb', 'envs', 'configs', f'{env_name}_config.json')
             env = RockSample(rand_key, config_path=config_path)
         else:
             env = RockSample(rand_key)

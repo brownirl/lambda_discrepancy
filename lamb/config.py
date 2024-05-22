@@ -3,10 +3,9 @@ from typing import Literal
 from jax import numpy as jnp
 from tap import Tap
 
+
 class BatchHyperparams(Tap):
-    env: str = 'CartPole-P-v0'
-    # env: str = 'Hopper-P-v0'
-    # env: str = 'MemoryChain-bsuite'
+    env: str = 'rocksample_5_5'
     default_max_steps_in_episode: int = 1000
     memoryless: bool = False
     double_critic: bool = False

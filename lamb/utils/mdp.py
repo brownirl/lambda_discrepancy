@@ -81,10 +81,6 @@ def get_td_model(pomdp: POMDP, pi: jnp.ndarray):
 def all_t_discounted_returns(discounts: np.ndarray, rewards: np.ndarray):
     """
     Calculating discounted returns for every time step.
-    Taken from
-    https://github.com/samlobel/grl/blob/4f7837ec7ea48d9f167420ac59c8d65b1d332161/grl/baselines/rnn_agent.py#L39
-    FOR SOME REASON! There's a memory leak when we use jnp here.
-    I suspect it's in either the jnp.cumsum or jnp.cumprod.
     """
     # Since we're calculating returns for each reward, we need to step timestep back by one
     shunted_discounts = np.concatenate([np.ones_like(discounts[0:1]), discounts[:-1]])

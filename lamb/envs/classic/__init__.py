@@ -29,7 +29,7 @@ def load_spec(name: str, **kwargs):
     # Try to load from examples_lib first
     # then from pomdp_files
     try:
-        pomdp_dir = Path(ROOT_DIR) / 'porl' / 'envs' / 'classic' / 'POMDP'
+        pomdp_dir = Path(ROOT_DIR) / 'lamb' / 'envs' / 'classic' / 'POMDP'
 
         potential_pomdp_paths = [pomdp_dir / f'{name}.POMDP', pomdp_dir / f'{name}.pomdp']
 

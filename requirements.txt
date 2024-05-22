@@ -15,3 +15,5 @@ gymnax
 distrax
 jumanji
 onager
+jax_tqdm
+gmpy2

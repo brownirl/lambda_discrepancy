@@ -16,3 +16,5 @@ The RNN experiments have the entry point
 
 Instructions to run hyperparameter sweeps are
 in `scripts/experiments.md`.
+
+We also include the data used to generate our plots
