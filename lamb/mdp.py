@@ -1,5 +1,4 @@
 import copy
-from gmpy2 import mpz
 import gymnasium as gym
 from gymnasium import spaces
 import jax.numpy as jnp
@@ -103,24 +102,6 @@ class MDP(gym.Env):
 
     def __repr__(self):
         return repr(self.T) + '\n' + repr(self.R)
-
-    def get_policy(self, i):
-        n_actions, n_states = self.action_space.n, self.state_space.n
-        assert i < n_actions**n_states
-        if not (2 <= n_actions <= 62):
-            raise ValueError(f'gmpy2.mpz.digits only supports integer bases in the'
-                             f'range [2, 62], but n_actions = {n_actions}')
-        policy_str = mpz(str(i)).digits(mpz(str(n_actions))).zfill(n_states)
-        policy = np.array([int(x) for x in reversed(policy_str)])
-        return policy
-
-    def all_policies(self):
-        policies = []
-        n_policies = self.action_space.n**self.state_space.n
-        for i in range(n_policies):
-            pi = self.get_policy(i)
-            policies.append(pi)
-        return policies
 
     def stationary_distribution(self, pi=None, p0=None, max_steps=200):
         if p0 is None:
@@ -281,9 +262,6 @@ class POMDP(MDP):
                 return False
         return True
 
-    def piecewise_constant_policies(self):
-        return [pi for pi in self.base_mdp.all_policies() if self.is_abstract_policy(pi)]
-
     def get_abstract_policy(self, pi):
         assert self.is_abstract_policy(pi)
         mask = self.phi.transpose()
@@ -292,10 +270,6 @@ class POMDP(MDP):
 
     def get_ground_policy(self, pi):
         return self.phi @ pi
-
-    def abstract_policies(self):
-        pi_list = self.piecewise_constant_policies()
-        return [self.get_abstract_policy(pi) for pi in pi_list]
 
     def generate_random_policies(self, n):
         policies = []

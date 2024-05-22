@@ -32,6 +32,7 @@ from lamb.utils.loss import (
     mem_bellman_loss,
     obs_space_mem_discrep_loss
 )
+from lamb.utils.optimizer import get_optimizer
 from lamb.utils.policy import get_unif_policies
 
 
@@ -54,7 +55,7 @@ def get_args():
                         type=float,
                         help='probability of traversing up at junction for tmaze_hyperparams')
 
-    parser.add_argument('--spec', default='tmaze_5_two_thirds_up', type=str,
+    parser.add_argument('--spec', default='tmaze5', type=str,
                         help='name of POMDP spec; evals Pi_phi policies by default')
     parser.add_argument('--mi_iterations', type=int, default=1,
                         help='For memory iteration, how many iterations of memory iterations do we do?')

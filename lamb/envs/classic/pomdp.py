@@ -2,6 +2,7 @@ from typing import List, Union
 
 import gymnasium as gym
 from gymnasium import spaces
+import jax.numpy as jnp
 from jax.tree_util import register_pytree_node_class
 import numpy as np
 
@@ -558,6 +559,7 @@ class POMDP(gym.Env):
                  p0: np.ndarray,
                  gamma: float,
                  phi: np.ndarray = None,
+                 terminal_mask: np.ndarray = None,
                  rand_key: np.random.RandomState = None):
         self.gamma = gamma
         self.T = T
@@ -570,8 +572,15 @@ class POMDP(gym.Env):
         self.current_state = None
         self.rand_key = rand_key
 
+        # Terminal mask is a boolean mask across all states that indicates
+        # whether the state is a terminal(/absorbing) state.
+        if terminal_mask is not None:
+            self.terminal_mask = terminal_mask
+        else:
+            self.terminal_mask = jnp.array([jnp.all(self.T[:, i, i] == 1.) for i in range(self.T.shape[-1])])
+
     def tree_flatten(self):
-        children = (self.T, self.R, self.p0, self.gamma, self.phi)
+        children = (self.T, self.R, self.p0, self.gamma, self.phi, self.terminal_mask)
         aux_data = None
         return (children, aux_data)
 

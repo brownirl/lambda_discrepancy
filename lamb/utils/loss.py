@@ -406,7 +406,7 @@ def mstd_err(
     vals = {'v': v_vals, 'q': q_vals}
     # assert value_type == 'q'
 
-    n_states = pomdp.base_mdp.state_space.n
+    n_states = pomdp.state_space.n
     n_obs = pomdp.observation_space.n
     n_actions = pomdp.action_space.n
 
@@ -431,7 +431,7 @@ def mstd_err(
     )
 
     # Expanded and repeated reward tensor
-    R_sas = jnp.swapaxes(pomdp.base_mdp.R, 0, 1)
+    R_sas = jnp.swapaxes(pomdp.R, 0, 1)
     R_soasoa = (
         R_sas[:, None, :, :, None, None]
         .repeat(n_obs, axis=1)
@@ -459,7 +459,7 @@ def mstd_err(
 
     # Retrieve Pr(o|s), Pr(s'|s,a)
     phi_so = pomdp.phi
-    T_sas = jnp.swapaxes(pomdp.base_mdp.T, 0, 1)
+    T_sas = jnp.swapaxes(pomdp.T, 0, 1)
 
     # Compute Pr(s,o,a,s',o',a')
     pr_s_soasoa =       pr_s[   :, None, None, None, None, None] # Pr(s)
