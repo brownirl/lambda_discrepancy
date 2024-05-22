@@ -3,21 +3,29 @@ import pickle
 from pathlib import Path
 
 import numpy as np
+from matplotlib import rc
 import matplotlib.pyplot as plt
 from scipy.stats import sem
 
 from definitions import ROOT_DIR
 
-emerald = "#2ecc71"
-turquoise = "#1abc9c"
-peter_river = "#3498db"
-sunflower = "#f1c40f"
-alizarin = "#e74c3c"
-pumpkin = "#d35400"
-green_sea = "#16a085"
-wisteria = "#8e44ad"
-midnight_blue = "#2c3e50"
-all_colors = [peter_river, pumpkin, emerald, alizarin, wisteria, sunflower]
+rc('font', **{'family': 'serif', 'serif': ['cmr10']})
+
+colors = {
+    'pink': '#ff96b6',
+    'red': '#df5b5d',
+    'orange': '#DD8453',
+    'yellow': '#f8de7c',
+    'green': '#3FC57F',
+    'cyan': '#48dbe5',
+    'blue': '#3180df',
+    'purple': '#9d79cf',
+    'brown': '#886a2c',
+    'white': '#ffffff',
+    'light gray': '#d5d5d5',
+    'dark gray': '#666666',
+    'black': '#000000'
+}
 
 env_name_to_title = {
     'rocksample_15_15': 'RockSample (15, 15)',
@@ -25,6 +33,14 @@ env_name_to_title = {
     'pocman': 'Pocman',
     'battleship_10': 'Battleship 10x10',
     'battleship_5': 'Battleship 5x5',
+    'cheese.95': 'Cheese Maze',
+    'hallway': 'Hallway',
+    'heavenhell': 'Heaven & Hell',
+    'network': 'Network',
+    'paint': 'Paint',
+    'shuttle': 'Shuttle',
+    'tiger-alt-start': 'Tiger (Alt Start)',
+    'tmaze_5': 'T-Maze'
 }
 
 env_name_to_x_upper_lim = {
@@ -37,13 +53,12 @@ env_name_to_x_upper_lim = {
     'tmaze_5': 2e6
 }
 
-
 def plot_reses(all_reses: list[tuple], n_rows: int = 2,
                individual_runs: bool = False):
     plt.rcParams.update({'font.size': 32})
 
     # check to see that all our envs are the same across all reses.
-    all_envs = [set(x['envs']) for _, x in all_reses]
+    all_envs = [set(x['envs']) for _, x, _ in all_reses]
     for envs in all_envs:
         assert envs == all_envs[0]
 
@@ -53,7 +68,7 @@ def plot_reses(all_reses: list[tuple], n_rows: int = 2,
     n_cols = max((len(envs) + 1) // n_rows, 1) if len(envs) > 1 else 1
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(30, 20))
 
-    for k, (study_name, res) in enumerate(all_reses):
+    for k, (study_name, res, color) in enumerate(all_reses):
         scores = res['scores']
         if isinstance(scores, list):
             mean_over_steps = [score.mean(axis=1)[..., 0] for score in scores]
@@ -87,21 +102,22 @@ def plot_reses(all_reses: list[tuple], n_rows: int = 2,
             x = np.arange(env_mean.shape[0]) * x_axis_multiplier
             x_upper_lim = env_name_to_x_upper_lim.get(env, None)
 
-            ax.plot(x, env_mean, label=study_name, color=all_colors[k])
+            ax.plot(x, env_mean, label=study_name, color=colors[color])
             if individual_runs:
                 # -2 index is seeds.
                 for j in range(mean_over_steps.shape[-2]):
                     alpha = 1 / mean_over_steps.shape[-2]
                     m = mean_over_steps[..., j, env_idx] if isinstance(mean_over_steps, np.ndarray) else mean_over_steps[env_idx][..., j]
-                    ax.plot(x, m, color=all_colors[k], alpha=alpha)
+                    ax.plot(x, m, color=colors[color], alpha=alpha)
             else:
                 ax.fill_between(x, env_mean - env_std_err, env_mean + env_std_err,
-                                color=all_colors[k], alpha=0.35)
+                                color=colors[color], alpha=0.35)
             ax.set_title(env_name_to_title.get(env, env))
             if x_upper_lim is not None:
                 ax.set_xlim(right=x_upper_lim)
             # ax.margins(x=0.015)
             ax.locator_params(axis='x', nbins=3, min_n_ticks=3)
+            ax.locator_params(axis='y', nbins=3)
             ax.spines[['right', 'top']].set_visible(False)
 
     # Customize legend to use square markers
@@ -122,7 +138,6 @@ def plot_reses(all_reses: list[tuple], n_rows: int = 2,
     plt.show()
     return fig, axes
 
-
 def get_total_steps_multiplier(saved_steps: int, hparam_path: Path):
     spec = importlib.util.spec_from_file_location('temp', hparam_path)
     var_module = importlib.util.module_from_spec(spec)
@@ -141,24 +156,25 @@ def get_total_steps_multiplier(saved_steps: int, hparam_path: Path):
 
 
 if __name__ == "__main__":
-    env_name = 'pomdps'
+    env_name = 'pocman'
 
     # normal
     # study_paths = [
-    #     ('λ-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_LD_ppo')),
-    #     ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_ppo')),
+    #     ('$\lambda$-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_LD_ppo'), 'green'),
+    #     ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_ppo'), 'blue'),
     # ]
 
     # fixedlambda
     # study_paths = [
-    #     ('λ-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_fixedlambda_LD_ppo')),
-    #     ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_fixedlambda_ppo')),
+    #     ('$\lambda$-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_fixedlambda_LD_ppo'), 'green'),
+    #     ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_fixedlambda_ppo'), 'blue'),
     # ]
 
     # best
     study_paths = [
-        ('λ-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_LD_ppo_best')),
-        ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_ppo_best')),
+        ('$\lambda$-discrepancy + PPO', Path(ROOT_DIR, 'results', f'{env_name}_LD_ppo_best'), 'green'),
+        ('PPO', Path(ROOT_DIR, 'results', f'{env_name}_ppo_best'), 'blue'),
+        ('Memoryless PPO', Path(ROOT_DIR, 'results', f'{env_name}_memoryless_ppo_best'), 'dark gray'),
     ]
 
     hyperparam_type = 'per_env'  # (all_env | per_env)
@@ -171,7 +187,7 @@ if __name__ == "__main__":
 
     all_reses = []
 
-    for name, study_path in study_paths:
+    for name, study_path, color in study_paths:
         if hyperparam_type == 'all_env':
             fname = "best_hyperparam_res.pkl"
             if name == 'PPO Markov':
@@ -182,7 +198,7 @@ if __name__ == "__main__":
         with open(study_path / fname, "rb") as f:
             best_res = pickle.load(f)
 
-        all_reses.append((name, best_res))
+        all_reses.append((name, best_res, color))
         hyperparam_path = study_path.parent.parent / 'scripts' / 'hyperparams' / f'{study_path.stem}.py'
         step_multiplier = get_total_steps_multiplier(best_res['scores'].shape[0], hyperparam_path)
         best_res['step_multiplier'] = [step_multiplier] * len(best_res['envs'])

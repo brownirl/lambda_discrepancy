@@ -19,4 +19,4 @@ in `scripts/experiments.md`.
 
 We also include the data used to generate our results in
 `results/analytical_results.csv` and 
-`results/rnn_results.csv`.
+`results/rnn_results.csv.zip`, which you can unzip for the CSV.
