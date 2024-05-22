@@ -1,0 +1,17 @@
+gymnasium
+jax[cpu]
+flax
+optax
+matplotlib
+-e .
+pandas
+scipy
+tqdm
+typed-argument-parser
+numpy
+pytest
+brax
+gymnax
+distrax
+jumanji
+onager
