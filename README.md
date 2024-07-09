@@ -1,6 +1,5 @@
 # λ-Discrepancy
-Code for the paper **Mitigating Partial Observability in 
-Decision Processes via the Lambda Discrepancy**.
+Code for the paper **Mitigating Partial Observability in Sequential Decision Processes via the Lambda Discrepancy**.
 
 For set up, make a virtual environment with
 Python version >=3.11, and
