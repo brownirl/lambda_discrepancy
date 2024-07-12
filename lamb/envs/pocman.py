@@ -125,7 +125,7 @@ class PocMan(PacMan, Environment):
         obs = obs.at[0].set(state.grid[jnp.maximum(state.player_locations.x - 1, 0), state.player_locations.y])  # up
         obs = obs.at[1].set(state.grid[state.player_locations.x, jnp.minimum(state.player_locations.y + 1, state.grid.shape[1] - 1)])  # right
         obs = obs.at[2].set(state.grid[jnp.minimum(state.player_locations.x + 1, state.grid.shape[0] - 1), state.player_locations.x])  # down
-        obs = obs.at[3].set(state.grid[state.player_locations.y, jnp.maximum(state.player_locations.x + 1, 0)])  # left
+        obs = obs.at[3].set(state.grid[state.player_locations.x, jnp.maximum(state.player_locations.y - 1, 0)])  # left
 
         # Now calculate if you smell food,
         # manhattan dist <= 2 means obs[4] = 1.
