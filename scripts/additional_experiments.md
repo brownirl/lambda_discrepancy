@@ -1,8 +1,16 @@
-# Scripts
+# Additional experiments
 
 This `scripts` directory includes scripts for plotting all experimental
 results in our work, as well as scripts for a few additional experiments
 in the paper.
+
+## Parity Check experiments
+The parity check closed-form optimization experiments were done with the 
+`batch_run_analytical.py` script, except with the option `--mem_aug_before_init_pi`.
+This option augments our POMDP with a random memory function before 
+choosing the initial policy that maximizes the λ-discrepancy. See the
+`parity_check*_30seeds.py` hyperparameter files to run these experiments.
+
 
 ## P.O. PacMan Memory Probe
 To train our memory probe, we need to first collect checkpoints from 
