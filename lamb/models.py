@@ -539,6 +539,32 @@ class BattleShipActorCritic(nn.Module):
 
         return hidden, pi, jnp.squeeze(v, axis=-1)
 
+
+class PelletPredictorNN(nn.Module):
+    hidden_size: int
+    n_outs: int
+    n_hidden_layers: int = 1
+
+    @nn.compact
+    def __call__(self, x):
+        out = nn.Dense(self.hidden_size, kernel_init=orthogonal(2), bias_init=constant(0.0))(
+            x
+        )
+        out = nn.relu(out)
+
+        for i in range(self.n_hidden_layers):
+            out = nn.Dense(
+                self.hidden_size, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
+            )(x)
+            out = nn.relu(out)
+
+        logits = nn.Dense(
+            self.n_outs, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
+        )(out)
+        predictions = nn.sigmoid(logits)
+        return predictions, logits
+
+
 def get_network_fn(env: environment.Environment, env_params: environment.EnvParams,
                    memoryless: bool = False):
     if isinstance(env, Battleship) or (hasattr(env, '_unwrapped') and isinstance(env._unwrapped, Battleship)):

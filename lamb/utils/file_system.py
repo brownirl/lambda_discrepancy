@@ -92,16 +92,40 @@ def load_info(results_path: Path) -> dict:
     return np.load(results_path, allow_pickle=True).item()
 
 
-def load_train_state(key: jax.random.PRNGKey, fpath: Path):
+def load_train_state(key: jax.random.PRNGKey, fpath: Path,
+                     update_idx_to_take: int = None,
+                     best_over_rng: bool = False):
     # load our params
     orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
     restored = orbax_checkpointer.restore(fpath)
     args = restored['args']
     unpacked_ts = restored['out']['runner_state'][0]
 
+    if update_idx_to_take is None:
+        best_idx = 0
+        if best_over_rng:
+            # we take the max here since we just want episode returns over all seeds
+            # and we take the mean over axis=-1 since we do n episodes of eval.
+            perf_across_seeds = restored['out']['final_eval_metric']['returned_discounted_episode_returns'].max(axis=-2).mean(axis=-1)
+            best_idx = np.squeeze(np.argmax(perf_across_seeds, axis=-1))
 
+        params = jax.tree_map(lambda x: x[0, 0, 0, 0, 0, 0, best_idx], unpacked_ts['params'])
+    else:
+        perf_across_seeds_expanded = restored['out']['metric']['returned_discounted_episode_returns'].squeeze().mean(axis=-1).mean(axis=-1)
+        all_ckpt_params = jax.tree.map(lambda x: x[0, 0, 0, 0, 0, 0], restored['out']['checkpoint'])
+        n_ckpt_steps = jax.tree.flatten(all_ckpt_params)[0][0].shape[1]
+        perf_interval = perf_across_seeds_expanded.shape[1] // n_ckpt_steps
+        perf_across_seeds = perf_across_seeds_expanded[:, ::perf_interval]
+        timestep_perf = perf_across_seeds[:, update_idx_to_take]
+        best_idx = np.argmax(timestep_perf)
+        params = jax.tree_map(lambda x: x[best_idx, update_idx_to_take], all_ckpt_params)
+
+
+    gamma = args['gamma']
+    if 'config' in restored:
+        gamma = restored['config']['GAMMA']
     env, env_params = get_gymnax_env(args['env'], key,
-                                     restored['config']['GAMMA'],
+                                     gamma=gamma,
                                      action_concat=args['action_concat'])
 
     network_fn, action_size = get_network_fn(env, env_params, memoryless=args['memoryless'])
@@ -110,8 +134,9 @@ def load_train_state(key: jax.random.PRNGKey, fpath: Path):
                          double_critic=args['double_critic'],
                          hidden_size=args['hidden_size'])
     tx = optax.adam(args['lr'][0])
+
     ts = TrainState.create(apply_fn=network.apply,
-                           params=jax.tree_map(lambda x: x[0, 0, 0, 0, 0, 0], unpacked_ts['params']),
+                           params=params,
                            tx=tx)
 
     return env, env_params, args, network, ts
