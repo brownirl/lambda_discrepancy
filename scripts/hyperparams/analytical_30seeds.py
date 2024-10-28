@@ -5,7 +5,7 @@ exp_name = Path(__file__).stem
 hparams = {
     'file_name':
         f'runs_{exp_name}.txt',
-    'entry': '-m batch_run_kitchen_sinks_ld_only',
+    'entry': '-m batch_run_analytical',
     'args': [{
         'spec': [
             'tiger-alt-start', 'tmaze_5_two_thirds_up', '4x3.95',
